@@ -98,7 +98,7 @@ game_state = [
 ]
 
 
-def start_game(player_score, computer_score):
+def start_game():
     """
     Initialize the game and execute the game turns. A
     new game starts with score 0 for both the player
@@ -106,71 +106,75 @@ def start_game(player_score, computer_score):
     called with the updated scores.
     """
 
-    # Initialize the game if this is the first round.
-    if player_score == 0 and computer_score == 0:
-        print("\nWelcome to Hangman, The Game!")
-        print("\nWhat is your name?")
-        player_name = input("> ")
-        time.sleep(0.4)
-        print("\nHi " + player_name + ", let's play!")
-        time.sleep(0.4)
+    # Initialize the game
+    player_score = 0
+    computer_score = 0
+    print("\nWelcome to Hangman, The Game!")
+    print("\nWhat is your name?")
+    player_name = input("> ")
+    time.sleep(0.4)
+    print("\nHi " + player_name + ", let's play!")
+    time.sleep(0.6)
 
-    word = pick_word()
-    current_state = 0
-    guess_list = []
+    # Start the game loop
+    while True:
+        word = pick_word()
+        current_state = 0
+        guess_list = []
+        game_ended = False
 
-    print("\n--------------------\nHangman Rules\n"
-          + """
+        print("\n--------------------\nHangman Rules\n"
+              + """
 The rules are as follows. You have to guess the word
 before the hanging is completed. For every letter you
 guessed that is not part of the word, the hanging
 advances one step... Have fun!""")
 
-    # Execute game turns until end condition is reached.
-    while current_state < 8:
+        # Process turns
+        while not game_ended:
 
-        while True:
-            player_guess = input("\nGuess a letter: ")
-            if len(check_guess(player_guess, guess_list)) == 0:
-                break
-            print(check_guess(player_guess, guess_list))
+            while True:
+                player_guess = input("\nGuess a letter: ")
+                if len(check_guess(player_guess, guess_list)) == 0:
+                    break
+                print(check_guess(player_guess, guess_list))
 
-        guess_list.append(player_guess.lower())
+            guess_list.append(player_guess.lower())
 
-        if player_guess not in word:
-            current_state = current_state + 1
-            print("Uh oh! That letter is not in the word: "
-                  + show_word(word, guess_list)
-                  + "\n"
-                  + game_state[current_state])
-        else:
-            print("Good guess! The word is now: "
-                  + show_word(word, guess_list))
+            if player_guess not in word:
+                current_state = current_state + 1
+                print("Uh oh! That letter is not in the word: "
+                      + show_word(word, guess_list)
+                      + "\n"
+                      + game_state[current_state])
+            else:
+                print("Good guess! The word is now: "
+                      + show_word(word, guess_list))
 
-        # Win condition
-        if check_win(word, guess_list) == 1:
-            player_score += 1
-            print("\n>> YOU WIN! <<\n")
-            print("The score is now:")
-            print("Player " + str(player_score) + " - Computer "
-                  + str(computer_score) + "\n")
+            # Win condition
+            if check_win(word, guess_list) and current_state < 8:
+                game_ended = True
+                player_score += 1
+                print("\n>> YOU WIN! <<\n")
+                print("The score is now:")
+                print("Player " + str(player_score) + " - Computer "
+                      + str(computer_score) + "\n")
+            # Lose condition
+            elif current_state == 8:
+                game_ended = True
+                computer_score += 1
+                print("\nThe word was: "
+                      + show_word(word, list(string.ascii_lowercase)))
+                print("\n>> YOU LOSE! <<\n")
+                print("The score is now:")
+                print("Player " + str(player_score) + " - Computer "
+                      + str(computer_score) + "\n")
+
+        print("Do you want to play another game?")
+        choice = input("y/n: ")
+
+        if choice != 'y' and choice != 'Y':
             break
-
-        # Lose condition
-        if current_state == 8:
-            computer_score += 1
-            print("\nThe word was: "
-                  + show_word(word, list(string.ascii_lowercase)))
-            print("\n>> YOU LOSE! <<\n")
-            print("The score is now:")
-            print("Player " + str(player_score) + " - Computer "
-                  + str(computer_score) + "\n")
-
-    print("Do you want to play another game?")
-    choice = input("y/n: ")
-
-    if choice == 'y':
-        start_game(player_score, computer_score)
 
 
 def pick_word(minimum_length=8):
@@ -258,12 +262,12 @@ def check_win(word, guesses):
     >>> check_win("bacon", ['c', 'a', 'b', 'o', 'n'])
     1
     """
-    state = 1
+    state = True
     for letter in word:
         if letter not in guesses:
-            state = 0
+            state = False
     return state
 
 
 if __name__ == "__main__":
-    start_game(0, 0)
+    start_game()
