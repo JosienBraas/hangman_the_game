@@ -181,8 +181,10 @@ def pick_word(minimum_length=8):
     """
     with open(dictionary_file, 'r') as file_object:
         words = file_object.readlines()
-        # Danger! When no words of wanted length are
-        # available, this will be an endless loop!
+        # Make sure that this loop has an ending:
+        max_length = len(max(words, key=len)) - 1
+        if max_length < minimum_length:
+            minimum_length = max_length
         while True:
             random_word = random.choice(words).replace('\n', '')
             if len(random_word) >= minimum_length:
