@@ -129,10 +129,11 @@ advances one step... Have fun!""")
     # Execute game turns until end condition is reached.
     while current_state < 8:
 
-        player_guess = input("\nGuess a letter: ")
-        while len(check_guess(player_guess, guess_list)) > 0:
-            print(check_guess(player_guess, guess_list))
+        while True:
             player_guess = input("\nGuess a letter: ")
+            if len(check_guess(player_guess, guess_list)) == 0:
+                break
+            print(check_guess(player_guess, guess_list))
 
         guess_list.append(player_guess.lower())
 
@@ -172,61 +173,22 @@ advances one step... Have fun!""")
         start_game(player_score, computer_score)
 
 
-def pick_word(minimum_length=5):
+def pick_word(minimum_length=8):
     """() -> string
 
     Return a random word from the dictionary file. The minimum
     length of the word can optionally be provided as a parameter.
     """
-    file_length = file_len(dictionary_file)
-
-    while True:
-        random_number = random.randint(0, file_length)
-        random_line = get_line(random_number, dictionary_file)
-        if len(random_line) >= minimum_length:
-            word = random_line
-            break
-
+    with open(dictionary_file, 'r') as file_object:
+        words = file_object.readlines()
+        # Danger! When no words of wanted length are
+        # available, this will be an endless loop!
+        while True:
+            random_word = random.choice(words).replace('\n', '')
+            if len(random_word) >= minimum_length:
+                word = random_word
+                break
     return word
-
-
-def file_len(file_name):
-    """(string) -> int
-
-    Source:
-    http://stackoverflow.com/questions/845058/
-    how-to-get-line-count-cheaply-in-python
-
-    >>> file_len('dictionary_small.txt')
-    10
-    >>> file_len('dictionary.txt')
-    45349
-    """
-    with open(file_name) as f:
-        for i, element in enumerate(f):
-            pass
-    return i + 1
-
-
-def get_line(line_number, dictionary_file):
-    """(int, string) -> string
-
-    Source:
-    http://stackoverflow.com/questions/2081836/
-    reading-specific-lines-only-python
-
-    >>> get_line(5, 'dictionary_small.txt')
-    'gruff'
-    >>> get_line(20, 'dictionary.txt')
-    'abasing'
-    """
-    fp = open(dictionary_file)
-    for i, line in enumerate(fp):
-        if i == line_number - 1:
-            result = line
-            break
-    fp.close()
-    return result.rstrip()
 
 
 def check_guess(player_guess, guesses):
