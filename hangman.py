@@ -248,19 +248,19 @@ def show_word(word, guesses):
 
 
 def check_win(word, guesses):
-    """(string, [string]) -> int
+    """(string, [string]) -> bool
 
     Return the guess status of a word based on the word to be guessed
     and the guesses a player has made.
 
     >>> check_win("", [])
-    1
+    True
     >>> check_win("bacon", [])
-    0
+    False
     >>> check_win("bacon", ['f', 'c', 'g', 'e'])
-    0
+    False
     >>> check_win("bacon", ['c', 'a', 'b', 'o', 'n'])
-    1
+    True
     """
     state = True
     for letter in word:
